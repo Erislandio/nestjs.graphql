@@ -1,4 +1,4 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, ID, Query, Resolver } from '@nestjs/graphql';
 import { UserService } from './app.service';
 import { User } from './entity/user.entity';
 
@@ -6,17 +6,13 @@ import { User } from './entity/user.entity';
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-  @Query(() => User, { name: 'getUser', nullable: true })
-  public getUser(@Args('id') id: string) {
-    const user = this.userService.findById(id);
-
-    if (!user) return null;
-
-    return user;
+  @Query(() => [User], { name: 'users' })
+  listUsers() {
+    return this.userService.list();
   }
 
-  @Query(() => [User], { name: 'listUsers' })
-  public listUsers() {
-    return this.userService.list();
+  @Query(() => User, { name: 'user' })
+  getUserById(@Args('id', { type: () => ID }) id: string) {
+    return this.userService.findById(id);
   }
 }
